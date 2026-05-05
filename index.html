@@ -3,49 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menú Digital - Garden</title>
+    <title>Garden Café - Menú Digital</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f4f9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100-vh;
-            margin: 0;
-            text-align: center;
+            margin: 0; padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; position: relative;
+            background-color: #1b4332;
         }
-        .container {
-            background: white;
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            max-width: 90%;
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('fondoHD.png');
+            background-size: cover;
+            background-position: top center;
+            z-index: -1;
         }
-        h1 { color: #333; }
-        p { color: #666; margin-bottom: 2rem; }
-        .btn {
-            background-color: #27ae60;
-            color: white;
-            text-decoration: none;
-            padding: 12px 25px;
+
+        .menu-container {
+            position: relative; z-index: 10;
+            width: 85%; max-width: 380px;
+            text-align: center; padding: 30px;
+            background-color: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             border-radius: 30px;
-            font-weight: bold;
-            transition: background 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
         }
-        .btn:hover {
-            background-color: #219150;
+
+        .logo { width: 160px; height: auto; margin-bottom: 25px; }
+
+        .boton-menu {
+            display: block;
+            background-color: #1b4332;
+            color: white;
+            padding: 20px;
+            margin: 20px 0;
+            text-decoration: none;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            border: none;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .boton-menu:active { transform: scale(0.95); }
+
+        /* Estilo de la ráfaga de hojas (Mucho más grande ahora) */
+        .leaf-burst {
+            position: fixed;
+            width: 150px; /* Tamaño lo suficientemente grande para ver tu imagen */
+            height: 150px;
+            background-image: url('hojas.png');
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            pointer-events: none;
+            z-index: 9999;
+            /* Inicia pequeño y centrado en el clic */
+            transform: translate(-50%, -50%) scale(0.1);
+            transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.7s ease-out;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Bienvenidos</h1>
-        <p>Haz clic abajo para ver nuestra carta completa</p>
-        <!-- ASEGÚRATE DE QUE EL NOMBRE DEL ARCHIVO COINCIDA EXACTAMENTE -->
-        <a href="menu-restaurant.pdf" class="btn">Ver Menú PDF</a>
+    <div class="menu-container">
+        <img src="logo.png" alt="Logo" class="logo">
+
+        <button class="boton-menu" onclick="explotarHojas(event, 'menu-merienda.pdf')">
+            ☕ MERIENDAS Y DESAYUNOS
+        </button>
+
+        <button class="boton-menu" onclick="explotarHojas(event, 'menu-almuerzo.pdf')">
+            🍽️ ALMUERZOS Y COMBOS
+        </button>
     </div>
 
+    <script>
+        function explotarHojas(e, url) {
+            const container = document.body;
+            const x = e.clientX || (e.touches && e.touches[0].clientX) || window.innerWidth / 2;
+            const y = e.clientY || (e.touches && e.touches[0].clientY) || window.innerHeight / 2;
+
+            // Lanzamos 5 bloques grandes de hojas en lugar de muchos chiquitos
+            for (let i = 0; i < 5; i++) {
+                const burst = document.createElement('div');
+                burst.className = 'leaf-burst';
+                burst.style.left = x + 'px';
+                burst.style.top = y + 'px';
+                
+                container.appendChild(burst);
+
+                // Forzamos al navegador a registrar el elemento antes de animar
+                burst.getBoundingClientRect();
+
+                // Calculamos hacia dónde va a salir volando cada bloque
+                const angle = Math.random() * Math.PI * 2;
+                const dist = 80 + Math.random() * 120; // Qué tan lejos llega
+                const tx = Math.cos(angle) * dist;
+                const ty = Math.sin(angle) * dist;
+                const rot = (Math.random() - 0.5) * 180; // Rotación suave
+                const scale = 0.8 + Math.random() * 0.5; // Tamaño final
+
+                // Aplicamos la animación
+                burst.style.transform = `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) rotate(${rot}deg) scale(${scale})`;
+                burst.style.opacity = '0';
+
+                // Limpiamos el HTML después de que termine
+                setTimeout(() => burst.remove(), 800);
+            }
+
+            // Redirigimos al PDF después de que se aprecie la explosión
+            setTimeout(() => {
+                window.location.href = url;
+            }, 550);
+        }
+    </script>
 </body>
 </html>
